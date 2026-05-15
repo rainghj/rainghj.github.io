@@ -1,0 +1,18 @@
+{
+  "title": "🛠️ AI 工具箱",
+  "groups": [
+    {
+      "label": "插件",
+      "items": [
+        { "title": "Claude Code", "icon": "🤖", "doc": "docs/claude-code.md" },
+        { "title": "Superpowers", "icon": "⚡", "doc": "docs/superpowers.md" }
+      ]
+    },
+    {
+      "label": "Agent",
+      "items": [
+        { "title": "MiniMax", "icon": "🎭", "doc": "docs/minimax.md" }
+      ]
+    }
+  ]
+}
