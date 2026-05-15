@@ -107,7 +107,7 @@ body {
   flex: 1;
   margin-left: var(--sidebar-width);
   padding: 2rem;
-  max-width: 900px;
+  max-width: 1200px;
 }
 
 .content-inner {
