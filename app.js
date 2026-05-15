@@ -1,6 +1,7 @@
 // State
 let navData = null;
 let currentDoc = null;
+let isLoading = false;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', init);
@@ -15,6 +16,14 @@ async function init() {
         // Render sidebar
         renderSidebar();
 
+        // Attach click listener to nav container
+        const container = document.getElementById('navContainer');
+        container.addEventListener('click', async (e) => {
+            const navItem = e.target.closest('.nav-item');
+            if (!navItem) return;
+            await handleNavClick(navItem);
+        });
+
         // Load first document
         const firstItem = findFirstItem(navData);
         if (firstItem) {
@@ -23,6 +32,12 @@ async function init() {
     } catch (error) {
         showError('加载导航失败: ' + error.message);
     }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 function renderSidebar() {
@@ -34,15 +49,14 @@ function renderSidebar() {
 
     navData.groups.forEach(group => {
         html += `<div class="nav-group">
-            <div class="nav-group-label">${group.label}</div>`;
+            <div class="nav-group-label">${escapeHtml(group.label)}</div>`;
 
         group.items.forEach(item => {
             const isActive = currentDoc === item.doc ? 'active' : '';
             html += `<div class="nav-item ${isActive}"
-                         data-doc="${item.doc}"
-                         onclick="handleNavClick(this)">
+                         data-doc="${escapeHtml(item.doc)}">
                 <span class="nav-item-icon">${item.icon}</span>
-                <span class="nav-item-title">${item.title}</span>
+                <span class="nav-item-title">${escapeHtml(item.title)}</span>
             </div>`;
         });
 
@@ -62,6 +76,8 @@ function findFirstItem(navData) {
 }
 
 async function handleNavClick(element) {
+    if (isLoading) return;
+
     const doc = element.dataset.doc;
 
     // Update active state
@@ -73,6 +89,8 @@ async function handleNavClick(element) {
 }
 
 async function loadDocument(docPath) {
+    if (isLoading) return;
+    isLoading = true;
     currentDoc = docPath;
     const contentArea = document.getElementById('contentArea');
     contentArea.innerHTML = '<div class="loading"></div>';
@@ -109,7 +127,10 @@ async function loadDocument(docPath) {
         renderSidebar();
 
     } catch (error) {
+        currentDoc = null;
         showError('加载文档失败: ' + error.message);
+    } finally {
+        isLoading = false;
     }
 }
 
