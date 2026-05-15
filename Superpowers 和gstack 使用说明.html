@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Superpowers & gstack 使用说明</title>
+    <style>
+        :root {
+            --bg: #f5f7fa;
+            --card-bg: #ffffff;
+            --text: #2c3e50;
+            --text-secondary: #5a6c7d;
+            --border: #e2e8f0;
+            --primary: #3b82f6;
+            --primary-light: #eff6ff;
+            --accent-orange: #f59e0b;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --radius: 10px;
+            --radius-sm: 6px;
+            --transition: 0.2s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .hero {
+            text-align: center;
+            padding: 3rem 1rem 2rem;
+        }
+        .hero h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        .hero .subtitle {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            max-width: 650px;
+            margin: 0 auto;
+        }
+        .hero .badge-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .badge-super {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .badge-gstack {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        /* Nav */
+        .nav-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: 1.2rem 1.6rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            border: 1px solid var(--border);
+        }
+        .nav-card a {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.92rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+        .nav-card a:hover {
+            background: var(--primary-light);
+        }
+
+        /* Sections */
+        section {
+            margin-bottom: 2.5rem;
+        }
+        section h2 {
+            font-size: 1.55rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        section h2 .icon {
+            font-size: 1.4rem;
+        }
+        section h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin: 1.4rem 0 0.6rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem 1.8rem;
+            margin-bottom: 1.2rem;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+        }
+        @media (max-width: 768px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Code blocks */
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.2rem;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            line-height: 1.5;
+            margin: 0.6rem 0 1rem;
+            font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.88em;
+            font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+            color: #334155;
+        }
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: #e2e8f0;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.8rem 0 1.2rem;
+            font-size: 0.9rem;
+        }
+        th,
+        td {
+            text-align: left;
+            padding: 0.65rem 0.9rem;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: #f8fafc;
+            font-weight: 700;
+            color: #475569;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        tr:hover td {
+            background: #fafcfd;
+        }
+
+        /* Lists */
+        ul,
+        ol {
+            padding-left: 1.3rem;
+            margin: 0.5rem 0;
+        }
+        li {
+            margin-bottom: 0.3rem;
+        }
+
+        /* Callout */
+        .callout {
+            border-left: 4px solid var(--primary);
+            background: var(--primary-light);
+            padding: 0.9rem 1.2rem;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        .callout.warn {
+            border-left-color: var(--accent-orange);
+            background: #fff7ed;
+        }
+        .callout.success {
+            border-left-color: var(--accent-green);
+            background: #ecfdf5;
+        }
+        .callout strong {
+            color: #1e293b;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- Hero -->
+        <header class="hero">
+            <h1>🛠️ Superpowers &amp; gstack 使用说明</h1>
+            <p class="subtitle">
+                两大社区框架，将 Claude Code 从通用助手升级为遵循工程纪律的虚拟开发团队。
+                本文涵盖核心概念、安装部署、工作流命令及对比选型建议。
+            </p>
+            <div class="badge-row">
+                <span class="badge badge-super">⭐ Superpowers ~149K Stars</span>
+                <span class="badge badge-gstack">⭐ gstack ~65K Stars</span>
+            </div>
+        </header>
+
+        <!-- Nav -->
+        <nav class="nav-card">
+            <a href="#overview">📖 框架总览</a>
+            <a href="#install">⚙️ 安装部署</a>
+            <a href="#superpowers">🔵 Superpowers 详解</a>
+            <a href="#gstack">🟠 gstack 详解</a>
+            <a href="#compare">⚖️ 对比与选型</a>
+            <a href="#combine">🔗 组合使用</a>
+        </nav>
+
+        <!-- ==================== 框架总览 ==================== -->
+        <section id="overview">
+            <h2><span class="icon">📖</span> 框架总览</h2>
+
+            <div class="card-grid">
+                <div class="card">
+                    <h3>🔵 Superpowers</h3>
+                    <p><strong>定位：</strong>技能驱动的工程方法论，强制 TDD 与分阶段工作流，约束 AI 按规范行事。</p>
+                    <p><strong>作者：</strong>Jesse Vincent (obra) | <strong>仓库：</strong><a href="https://github.com/obra/superpowers" target="_blank">github.com/obra/superpowers</a></p>
+                    <p><strong>核心哲学：</strong>AI 是“热情但缺乏判断力的初级工程师”，必须通过纪律和流程来约束[reference:0]。</p>
+                </div>
+                <div class="card">
+                    <h3>🟠 gstack</h3>
+                    <p><strong>定位：</strong>角色驱动的虚拟工程团队，用 CEO、架构师、QA 等角色分工完善决策链。</p>
+                    <p><strong>作者：</strong>Garry Tan (YC CEO) | <strong>仓库：</strong><a href="https://github.com/garrytan/gstack" target="_blank">github.com/garrytan/gstack</a></p>
+                    <p><strong>核心哲学：</strong>不要让一个 AI 扮演所有角色，而是组建一支结构化的专家团队各司其职[reference:1]。</p>
+                </div>
+            </div>
+
+            <div class="callout">
+                <strong>一句话区别：</strong>Superpowers 关心的是 AI 该<strong>按照什么方法做事</strong>；gstack 关心的是 AI 该<strong>以什么角色做判断</strong>[reference:2]。
+            </div>
+        </section>
+
+        <!-- ==================== 安装部署 ==================== -->
+        <section id="install">
+            <h2><span class="icon">⚙️</span> 安装部署</h2>
+            <p>两个框架均以 Claude Code Skills 形式存在，安装即启用。前置要求：已安装 <strong>Claude Code</strong>、<strong>Git</strong>，gstack 额外要求 <strong>Bun ≥ 1.0</strong>[reference:3]。</p>
+
+            <div class="card-grid">
+                <div class="card">
+                    <h3>🔵 安装 Superpowers</h3>
+                    <p>通过 Claude Code 插件市场安装：</p>
+                    <pre><code># 1. 添加官方插件源
+/plugin marketplace add anthropic/plugins
+
+# 2. 安装 Superpowers 插件
+/plugin install superpowers</code></pre>
+                    <p>安装后，Superpowers 的技能会自动触发，无需手动调用[reference:4]。</p>
+                    <div class="callout success">
+                        <strong>验证：</strong>输入“帮我实现一个新功能”，观察是否自动触发 brainstorm → plan → TDD 流程[reference:5]。
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>🟠 安装 gstack</h3>
+                    <pre><code># 克隆仓库并运行 setup
+git clone --single-branch --depth 1 \
+  https://github.com/garrytan/gstack.git \
+  ~/.claude/skills/gstack
+
+cd ~/.claude/skills/gstack && ./setup</code></pre>
+                    <p>setup 脚本会自动检测已安装的编码代理（Claude Code、Cursor、Codex、Gemini CLI 等）并完成适配[reference:6]。</p>
+                    <div class="callout success">
+                        <strong>验证：</strong>输入 <code>/help</code> 检查 gstack 命令是否已生效[reference:7]。
+                    </div>
+                </div>
+            </div>
+
+            <div class="callout warn">
+                <strong>⚠️ 注意：</strong>同时安装两个框架可能导致技能冲突[reference:8]。如需组合使用，请参考下方<a href="#combine">组合使用</a>章节。
+            </div>
+        </section>
+
+        <!-- ==================== Superpowers 详解 ==================== -->
+        <section id="superpowers">
+            <h2><span class="icon">🔵</span> Superpowers 详解</h2>
+            <p>Superpowers 的核心铁律：<strong>没有失败测试，就不写生产代码</strong>。它将开发过程拆解为 7 个强制阶段，每个阶段都有检查门禁，不可跳过[reference:9]。</p>
+
+            <h3>🏗️ 七大核心工作流</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>阶段</th>
+                        <th>技能</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Brainstorming</td>
+                        <td>Socratic 式追问，厘清需求边界，生成设计文档</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Using Git Worktrees</td>
+                        <td>自动创建隔离分支，验证 baseline 测试</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Writing Plans</td>
+                        <td>将需求拆成 2-5 分钟可验证的微任务</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Subagent-Driven Development</td>
+                        <td>并行子 Agent 执行 + 两阶段 Review（Spec 符合性 → 代码质量）</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Test-Driven Development</td>
+                        <td>强制 Red-Green-Refactor，先写失败测试再实现</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Code Review</td>
+                        <td>自动生成 Review 意见，关键问题直接 Block</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>Finishing a Branch</td>
+                        <td>测试通过 → 合并/PR 建议 → 清理 Worktree</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>🎯 适用场景</h3>
+            <ul>
+                <li>对代码质量要求高，担心 AI 跳过测试或规范流程</li>
+                <li>需要 TDD 铁律提升代码覆盖率（社区反馈从 40% 提升到 95% 以上）[reference:10]</li>
+                <li>希望 AI 先设计后实现，避免"凭感觉写代码"</li>
+            </ul>
+
+            <div class="callout">
+                <strong>核心理念：</strong>Superpowers 不是让 Agent 更聪明，而是让它必须遵守真实软件工程流程[reference:11]。
+            </div>
+        </section>
+
+        <!-- ==================== gstack 详解 ==================== -->
+        <section id="gstack">
+            <h2><span class="icon">🟠</span> gstack 详解</h2>
+            <p>gstack 将 Claude Code 转变为包含 20+ 角色的虚拟工程团队，遵循 <strong>Think → Plan → Build → Review → Test → Ship → Reflect</strong> 的 Sprint 结构[reference:12]。</p>
+
+            <h3>👥 核心角色与命令</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>命令</th>
+                        <th>角色</th>
+                        <th>功能说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>/office-hours</code></td>
+                        <td>YC Partner</td>
+                        <td>六道强制追问，重新定义产品方向。设计文档自动流入下游技能[reference:13]</td>
+                    </tr>
+                    <tr>
+                        <td><code>/plan-ceo-review</code></td>
+                        <td>CEO / Founder</td>
+                        <td>从第一性原理重新审视问题，四种模式：Expansion / Selective Expansion / Hold Scope / Reduction[reference:14]</td>
+                    </tr>
+                    <tr>
+                        <td><code>/plan-eng-review</code></td>
+                        <td>Engineering Manager</td>
+                        <td>锁定架构、数据流、边界情况、测试矩阵[reference:15]</td>
+                    </tr>
+                    <tr>
+                        <td><code>/plan-design-review</code></td>
+                        <td>Senior Designer</td>
+                        <td>评分设计维度（0-10），AI Slop 检测，交互式设计选择[reference:16]</td>
+                    </tr>
+                    <tr>
+                        <td><code>/review</code></td>
+                        <td>Staff Engineer</td>
+                        <td>发现 CI 通过但生产爆炸的 Bug，自动修复明显问题，标记完整性缺陷[reference:17]</td>
+                    </tr>
+                    <tr>
+                        <td><code>/qa</code></td>
+                        <td>QA Lead</td>
+                        <td>真实浏览器自动化测试，自动点击、登录、生成多尺寸截图，发现 Bug 后自动修复并验证[reference:18]</td>
+                    </tr>
+                    <tr>
+                        <td><code>/ship</code></td>
+                        <td>Release Manager</td>
+                        <td>CI/CD 集成：自动合并、运行测试、打包推送、生成发布说明[reference:19]</td>
+                    </tr>
+                    <tr>
+                        <td><code>/guard</code></td>
+                        <td>Security Officer</td>
+                        <td>最高安全模式：危险操作前弹窗确认，锁定修改范围[reference:20]</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>🎯 适用场景</h3>
+            <ul>
+                <li>Solo Developer 或小团队，缺乏 PM、QA、安全等角色视角</li>
+                <li>从 0 到 1 冲刺 MVP，需要完整的产品构思 → 发布闭环</li>
+                <li>需要多维度的角色互相挑刺，补齐决策盲区[reference:21]</li>
+            </ul>
+
+            <div class="callout">
+                <strong>真实数据：</strong>Garry Tan 用 gstack 在 60 天内交付超过 60 万行生产代码（35% 为测试代码），平均每天 10,000-20,000 行[reference:22]。
+            </div>
+        </section>
+
+        <!-- ==================== 对比与选型 ==================== -->
+        <section id="compare">
+            <h2><span class="icon">⚖️</span> 对比与选型</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>维度</th>
+                        <th>🔵 Superpowers</th>
+                        <th>🟠 gstack</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>核心哲学</td>
+                        <td>工程方法论（怎么做）</td>
+                        <td>角色治理（谁来做判断）</td>
+                    </tr>
+                    <tr>
+                        <td>架构模式</td>
+                        <td>技能驱动，7 阶段强制工作流</td>
+                        <td>角色驱动，20+ 虚拟专家团队</td>
+                    </tr>
+                    <tr>
+                        <td>关键机制</td>
+                        <td>强制 TDD + Subagent 执行</td>
+                        <td>Sprint 结构 + 角色 Review 链</td>
+                    </tr>
+                    <tr>
+                        <td>适用规模</td>
+                        <td>个人到小团队</td>
+                        <td>个人到小团队</td>
+                    </tr>
+                    <tr>
+                        <td>学习曲线</td>
+                        <td>中等 — 需先理解方法论</td>
+                        <td>低 — 复制技能即可使用[reference:23]</td>
+                    </tr>
+                    <tr>
+                        <td>治理机制</td>
+                        <td>方法论强制执行纪律</td>
+                        <td>无内置治理层，信任流程[reference:24]</td>
+                    </tr>
+                    <tr>
+                        <td>许可证</td>
+                        <td>MIT</td>
+                        <td>MIT</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>🧭 选型决策指南</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>你的痛点</th>
+                        <th>推荐工具</th>
+                        <th>原因</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>怕 Agent 乱改、跳过 spec/test/review</td>
+                        <td><strong>Superpowers</strong></td>
+                        <td>用纪律约束 Agent 行为，强制每一步规范流程[reference:25]</td>
+                    </tr>
+                    <tr>
+                        <td>缺 PM、QA、安全等互相挑刺的视角</td>
+                        <td><strong>gstack</strong></td>
+                        <td>利用虚拟团队补齐决策盲区[reference:26]</td>
+                    </tr>
+                    <tr>
+                        <td>日常主力工具，只装一个</td>
+                        <td><strong>Superpowers</strong></td>
+                        <td>覆盖开发全流程，纪律性强，社区最活跃[reference:27]</td>
+                    </tr>
+                    <tr>
+                        <td>从 0 冲刺 MVP，产品构思到上线</td>
+                        <td><strong>gstack</strong></td>
+                        <td>完整的 Think → Ship 闭环，YC 验证的实战工作流[reference:28]</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout">
+                <strong>三层分工模型：</strong>gstack 做决策（判断做什么）、GSD 做上下文稳定（保证不跑偏）、Superpowers 做执行（方法论闭环）[reference:29]。
+            </div>
+        </section>
+
+        <!-- ==================== 组合使用 ==================== -->
+        <section id="combine">
+            <h2><span class="icon">🔗</span> 组合使用</h2>
+            <p>两个框架可以互补协作：<strong>gstack 负责决策层（做什么），Superpowers 负责执行层（怎么做）</strong>[reference:30]。</p>
+
+            <h3>📋 推荐全链路闭环流程</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>阶段</th>
+                        <th>工具</th>
+                        <th>命令</th>
+                        <th>产出</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>需求围攻</td>
+                        <td>gstack</td>
+                        <td><code>/office-hours</code></td>
+                        <td>产品设计文档，理清核心逻辑[reference:31]</td>
+                    </tr>
+                    <tr>
+                        <td>深度脑暴</td>
+                        <td>Superpowers</td>
+                        <td><code>/superpowers:brainstorm</code></td>
+                        <td>DESIGN.md，覆盖边界情况[reference:32]</td>
+                    </tr>
+                    <tr>
+                        <td>角色审查</td>
+                        <td>gstack</td>
+                        <td><code>/plan-ceo-review</code><br><code>/plan-eng-review</code></td>
+                        <td>CEO + 架构师多维审查通过</td>
+                    </tr>
+                    <tr>
+                        <td>任务拆解</td>
+                        <td>Superpowers</td>
+                        <td><code>/superpowers:write-plan</code></td>
+                        <td>2-5 分钟的微任务列表</td>
+                    </tr>
+                    <tr>
+                        <td>强制 TDD 执行</td>
+                        <td>Superpowers</td>
+                        <td><code>/superpowers:execute-plan</code></td>
+                        <td>先测试后代码，子 Agent 并行执行[reference:33]</td>
+                    </tr>
+                    <tr>
+                        <td>代码审查</td>
+                        <td>gstack</td>
+                        <td><code>/review</code></td>
+                        <td>Bug 检测与自动修复</td>
+                    </tr>
+                    <tr>
+                        <td>浏览器 QA</td>
+                        <td>gstack</td>
+                        <td><code>/qa</code></td>
+                        <td>真实浏览器自动化测试</td>
+                    </tr>
+                    <tr>
+                        <td>发布上线</td>
+                        <td>gstack</td>
+                        <td><code>/ship</code></td>
+                        <td>CI/CD 自动合并、测试、打包、发布</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout warn">
+                <strong>⚠️ 关键提醒：</strong>不要盲目安装全部技能。组合使用的核心是根据当前<strong>实际短板</strong>选择性地部署，理解每个层的作用后再组装属于你的工作流[reference:34]。
+            </div>
+        </section>
+
+        <footer>
+            <p>
+                本文基于社区公开资料整理，数据截至 2026 年 4 月。
+                · <a href="https://github.com/obra/superpowers" target="_blank">Superpowers</a>
+                · <a href="https://github.com/garrytan/gstack" target="_blank">gstack</a>
+                · 内容仅供学习参考。
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
