@@ -1,0 +1,122 @@
+/* Theme: Warm Document - Paper & Ink */
+
+:root {
+  /* Base - Warm Cream */
+  --bg: #f5f1eb;
+  --bg-elevated: #fffef9;
+  --bg-card: #faf8f5;
+  --text: #3d3528;
+  --text-secondary: #6b6355;
+  --text-muted: #9c9185;
+
+  /* Sidebar - Dark Warm Brown */
+  --sidebar-bg: linear-gradient(180deg, #2c2416 0%, #1f1a10 100%);
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 70px;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-text: #c4b89a;
+  --sidebar-text-active: #f5f1eb;
+  --sidebar-hover: rgba(255, 255, 255, 0.06);
+  --sidebar-active: rgba(245, 185, 110, 0.15);
+
+  /* Accent - Warm Amber */
+  --accent: #d97706;
+  --accent-dim: rgba(217, 119, 6, 0.12);
+  --accent-glow: 0 2px 12px rgba(217, 119, 6, 0.2);
+
+  /* Secondary Accent - Terracotta */
+  --accent-2: #b45309;
+  --accent-2-dim: rgba(180, 83, 9, 0.12);
+
+  /* Status */
+  --success: #15803d;
+  --warning: #b45309;
+  --error: #b91c1c;
+
+  /* Spacing */
+  --radius: 8px;
+  --radius-sm: 6px;
+  --shadow-sm: 0 1px 4px rgba(61, 53, 40, 0.06);
+  --shadow-lg: 0 4px 16px rgba(61, 53, 40, 0.1);
+
+  /* Theme specific */
+  --heading-marker-color: var(--accent);
+  --heading-marker-2-color: var(--accent-2);
+  --code-accent: var(--accent);
+  --table-header-color: var(--accent);
+  --link-color: var(--accent);
+  --scrollbar-thumb: rgba(61, 53, 40, 0.15);
+  --scrollbar-thumb-hover: rgba(61, 53, 40, 0.25);
+}
+
+/* Warm Theme Specific */
+body.theme-warm {
+  font-family: "Source Han Serif SC", "Noto Serif SC", Georgia, serif;
+}
+
+body.theme-warm .content-inner {
+  animation: fadeInWarm 0.5s ease-out;
+  border: 1px solid rgba(61, 53, 40, 0.08);
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 28px,
+    rgba(61, 53, 40, 0.02) 28px,
+    rgba(61, 53, 40, 0.02) 29px
+  );
+}
+
+@keyframes fadeInWarm {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body.theme-warm .content h1::before { content: none; }
+body.theme-warm .content h2::before { content: none; }
+body.theme-warm .content h3::before { content: none; }
+
+body.theme-warm .content h1 {
+  font-family: "Source Han Serif SC", "Noto Serif SC", serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+body.theme-warm .content pre {
+  background: #2c2416;
+  border: none;
+  border-radius: var(--radius-sm);
+}
+
+body.theme-warm .content pre::before {
+  display: none;
+}
+
+body.theme-warm .sidebar-logo {
+  background: var(--accent-dim);
+  box-shadow: var(--accent-glow);
+}
+
+body.theme-warm .nav-item::before {
+  background: var(--accent);
+  width: 3px;
+}
+
+/* Scrollbar */
+body.theme-warm ::-webkit-scrollbar {
+  width: 8px;
+}
+
+body.theme-warm ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body.theme-warm ::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}

@@ -7,10 +7,11 @@
     <meta name="description" content="AI 插件与 Agent 说明文档知识库">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
     <link rel="stylesheet" href="styles.css">
+    <link id="theme-stylesheet" rel="stylesheet" href="themes/dark.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 </head>
-<body>
+<body class="theme-dark">
     <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
 
@@ -30,6 +31,13 @@
                 <div class="loading"></div>
             </article>
         </main>
+    </div>
+
+    <!-- Theme Switcher -->
+    <div class="theme-switcher">
+        <button class="theme-btn active" data-theme="dark" onclick="switchTheme('dark')" title="暗夜极客风">🌙</button>
+        <button class="theme-btn" data-theme="warm" onclick="switchTheme('warm')" title="温暖文档风">📜</button>
+        <button class="theme-btn" data-theme="editorial" onclick="switchTheme('editorial')" title="编辑杂志风">📰</button>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>

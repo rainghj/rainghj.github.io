@@ -1,0 +1,68 @@
+/* Theme: Dark Cyberpunk - Neon Dark */
+
+:root {
+  /* Base */
+  --bg: #0d0d12;
+  --bg-elevated: #14141c;
+  --bg-card: #1a1a24;
+  --text: #e4e4e7;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+
+  /* Sidebar */
+  --sidebar-bg: linear-gradient(180deg, #0a0a0f 0%, #12121a 100%);
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 70px;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-text: #a1a1aa;
+  --sidebar-text-active: #fff;
+  --sidebar-hover: rgba(255, 255, 255, 0.04);
+  --sidebar-active: rgba(0, 255, 242, 0.08);
+
+  /* Accent */
+  --accent: #00fff2;
+  --accent-dim: rgba(0, 255, 242, 0.15);
+  --accent-glow: 0 0 20px rgba(0, 255, 242, 0.3);
+
+  /* Secondary Accent */
+  --accent-2: #a855f7;
+  --accent-2-dim: rgba(168, 85, 247, 0.15);
+
+  /* Status */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+
+  /* Spacing */
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* Theme specific */
+  --heading-marker-color: var(--accent);
+  --heading-marker-2-color: var(--accent-2);
+  --code-accent: var(--accent);
+  --table-header-color: var(--accent);
+  --link-color: var(--accent);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.1);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.2);
+}
+
+/* Dark Theme Specific */
+body.theme-dark {
+  background: var(--bg);
+  color: var(--text);
+}
+
+body.theme-dark .content-inner {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+body.theme-dark .sidebar-logo {
+  box-shadow: var(--accent-glow);
+}
+
+body.theme-dark .content pre::before {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}

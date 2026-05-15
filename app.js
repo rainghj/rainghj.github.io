@@ -2,12 +2,16 @@
 let navData = null;
 let currentDoc = null;
 let isLoading = false;
+let currentTheme = localStorage.getItem('theme') || 'dark';
 
 // Initialize
 document.addEventListener('DOMContentLoaded', init);
 
 async function init() {
     try {
+        // Apply saved theme
+        applyTheme(currentTheme);
+
         // Load navigation
         const navResponse = await fetch('nav.json');
         if (!navResponse.ok) throw new Error('Failed to load navigation');
@@ -43,7 +47,7 @@ function escapeHtml(text) {
 function renderSidebar() {
     const container = document.getElementById('navContainer');
     const titleEl = document.getElementById('sidebarTitle');
-    titleEl.textContent = navData.title || '🛠️ AI 工具箱';
+    titleEl.textContent = navData.title || 'AI 工具箱';
 
     let html = '';
 
@@ -167,7 +171,6 @@ async function handleHashChange() {
 // Load from hash on init
 if (window.location.hash) {
     const hashDoc = window.location.hash.slice(1);
-    // Defer until navData is loaded
     setTimeout(async () => {
         if (navData) {
             const exists = navData.groups.some(g => g.items.some(i => i.doc === hashDoc));
@@ -177,3 +180,43 @@ if (window.location.hash) {
         }
     }, 0);
 }
+
+// Theme switcher
+function applyTheme(theme) {
+    // Remove all theme classes
+    document.body.classList.remove('theme-dark', 'theme-warm', 'theme-editorial');
+
+    // Apply new theme
+    document.body.classList.add(`theme-${theme}`);
+    currentTheme = theme;
+
+    // Save preference
+    localStorage.setItem('theme', theme);
+
+    // Update theme buttons
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.theme === theme);
+    });
+}
+
+function switchTheme(theme) {
+    // Load theme CSS if not already loaded
+    const themeLinkId = 'theme-stylesheet';
+    let themeLink = document.getElementById(themeLinkId);
+    const themePath = `themes/${theme}.css`;
+
+    if (!themeLink) {
+        themeLink = document.createElement('link');
+        themeLink.id = themeLinkId;
+        themeLink.rel = 'stylesheet';
+        themeLink.href = themePath;
+        document.head.appendChild(themeLink);
+    } else if (themeLink.href !== themePath) {
+        themeLink.href = themePath;
+    }
+
+    applyTheme(theme);
+}
+
+// Make switchTheme available globally
+window.switchTheme = switchTheme;
