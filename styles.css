@@ -120,10 +120,13 @@ body {
   flex: 1;
   padding: 2.5rem 3rem;
   min-height: 100vh;
+  margin-left: var(--sidebar-width);
 }
 
 .content-inner {
   padding: 2.5rem;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 /* Markdown Content */
