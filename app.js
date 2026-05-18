@@ -2,7 +2,7 @@
 let navData = null;
 let currentDoc = null;
 let isLoading = false;
-let currentTheme = localStorage.getItem('theme') || 'dark';
+let currentTheme = localStorage.getItem('theme') || 'warm';
 
 // Initialize
 document.addEventListener('DOMContentLoaded', init);
