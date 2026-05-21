@@ -11,7 +11,8 @@
     {
       "label": "Agent",
       "items": [
-        { "title": "MiniMax", "icon": "🎭", "doc": "docs/minimax.md" }
+        { "title": "MiniMax", "icon": "🎭", "doc": "docs/minimax.md" },
+        { "title": "Pi Agent", "icon": "π", "doc": "docs/pi-project-documentation.html" }
       ]
     }
   ]

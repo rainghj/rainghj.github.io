@@ -62,7 +62,8 @@ body.theme-editorial .content-inner {
   animation: fadeInEditorial 0.6s ease-out;
   border: none;
   box-shadow: var(--shadow-lg);
-  max-width: 720px;
+  max-width: 960px;
+  margin: 0 auto;
   background: var(--bg-elevated);
 }
 
