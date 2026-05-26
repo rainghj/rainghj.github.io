@@ -2,6 +2,31 @@
 
 Claude Code 是 Anthropic 官方的命令行工具，帮助你在终端中使用 Claude 进行编程。
 
+## 快速上手
+
+```bash
+# 启动交互式会话
+claude
+
+# 继续上次对话
+claude -c
+
+# 指定模型并设置努力级别
+claude --model claude-sonnet-4-7 --effort high
+
+# 绕过权限检查（CI/CD 或信任环境）
+claude --permission-mode bypassPermissions
+
+# 非交互模式直接提问
+claude -p "解释一下这个项目的架构"
+
+# 创建隔离工作区
+claude -w
+
+# 查看帮助
+claude --help
+```
+
 ## 安装
 
 ```bash
@@ -322,8 +347,14 @@ claude ultrareview main..feature-branch
 不同场景推荐使用的权限模式：
 
 ```bash
-# CI/CD 自动化环境（完全自动化）
+# 绕过所有权限检查（最常用）
+claude --permission-mode bypassPermissions
+
+# 配合管道模式使用
 claude -p "your task" --permission-mode bypassPermissions
+
+# CI/CD 自动化环境
+claude -p "任务描述" --permission-mode bypassPermissions
 
 # 日常开发（自动接受编辑）
 claude --permission-mode acceptEdits
