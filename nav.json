@@ -5,7 +5,8 @@
       "label": "插件",
       "items": [
         { "title": "Claude Code", "icon": "🤖", "doc": "docs/claude-code.md" },
-        { "title": "Superpowers", "icon": "⚡", "doc": "docs/superpowers.md" }
+        { "title": "Superpowers", "icon": "⚡", "doc": "docs/superpowers.md" },
+        { "title": "MiMo-Code", "icon": "🧠", "doc": "MiMo-Code 使用说明.html" }
       ]
     },
     {
