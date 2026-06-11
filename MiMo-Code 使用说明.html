@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiMo-Code 使用说明 | AI 编程 Agent</title>
+    <style>
+        :root {
+            --bg: #f5f7fa;
+            --card-bg: #ffffff;
+            --text: #2c3e50;
+            --text-secondary: #5a6c7d;
+            --border: #e2e8f0;
+            --primary: #6366f1;
+            --primary-light: #eef2ff;
+            --accent-orange: #f59e0b;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --radius: 10px;
+            --radius-sm: 6px;
+            --transition: 0.2s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .hero {
+            text-align: center;
+            padding: 3rem 1rem 2rem;
+        }
+        .hero h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        .hero .subtitle {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .hero .badge-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .badge-mimo {
+            background: #eef2ff;
+            color: #6366f1;
+        }
+        .badge-oss {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        .badge-free {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        /* Nav */
+        .nav-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: 1.2rem 1.6rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .nav-card a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.92rem;
+            font-weight: 500;
+            padding: 0.3rem 0.6rem;
+            border-radius: var(--radius-sm);
+            transition: background var(--transition);
+        }
+        .nav-card a:hover {
+            background: var(--primary-light);
+        }
+
+        /* Sections */
+        .section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: 2rem 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-light);
+            color: var(--text);
+        }
+        .section h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin: 1.2rem 0 0.6rem;
+            color: var(--text);
+        }
+        .section p, .section li {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        .section ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .section li {
+            margin-bottom: 0.4rem;
+        }
+        .section a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .section a:hover {
+            text-decoration: underline;
+        }
+
+        /* Code blocks */
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.2rem;
+            overflow-x: auto;
+            font-size: 0.88rem;
+            line-height: 1.6;
+            margin: 0.8rem 0;
+        }
+        code {
+            font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", Menlo, Consolas, monospace;
+        }
+        :not(pre) > code {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.88rem;
+        }
+
+        /* Feature cards */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .feature-card {
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            padding: 1.2rem;
+            border-left: 4px solid var(--primary);
+            transition: box-shadow var(--transition);
+        }
+        .feature-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+        .feature-card.green { border-left-color: var(--accent-green); }
+        .feature-card.orange { border-left-color: var(--accent-orange); }
+        .feature-card.purple { border-left-color: var(--accent-purple); }
+        .feature-card.blue { border-left-color: var(--accent-blue); }
+        .feature-card h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: var(--text);
+        }
+        .feature-card p {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 0;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        thead {
+            background: var(--primary-light);
+        }
+        th {
+            padding: 0.7rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text);
+            border-bottom: 2px solid var(--border);
+        }
+        td {
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        tr:hover {
+            background: var(--bg);
+        }
+        td code {
+            font-size: 0.85rem;
+        }
+
+        /* Tip / Note boxes */
+        .tip-box, .note-box, .warn-box {
+            border-radius: var(--radius-sm);
+            padding: 1rem 1.2rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        .tip-box {
+            background: #dcfce7;
+            border-left: 4px solid #16a34a;
+            color: #166534;
+        }
+        .note-box {
+            background: #eef2ff;
+            border-left: 4px solid #6366f1;
+            color: #3730a3;
+        }
+        .warn-box {
+            background: #fef3c7;
+            border-left: 4px solid #d97706;
+            color: #92400e;
+        }
+        .tip-box strong, .note-box strong, .warn-box strong {
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .section { padding: 1.5rem; }
+            .hero h1 { font-size: 1.8rem; }
+            .feature-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero -->
+        <div class="hero">
+            <h1>MiMo-Code 使用说明</h1>
+            <p class="subtitle">小米 MiMo 团队开源的终端 AI 编程 Agent，具备跨会话记忆、智能上下文管理和自主进化能力</p>
+            <div class="badge-row">
+                <span class="badge badge-mimo">MIT License</span>
+                <span class="badge badge-oss">开源</span>
+                <span class="badge badge-free">MiMo Auto 限时免费</span>
+            </div>
+        </div>
+
+        <!-- Nav -->
+        <nav class="nav-card">
+            <a href="#quickstart">快速开始</a>
+            <a href="#features">核心特性</a>
+            <a href="#agents">工作模式</a>
+            <a href="#slash-commands">斜杠命令</a>
+            <a href="#tools">内置工具</a>
+            <a href="#keybinds">快捷键</a>
+            <a href="#config">配置</a>
+            <a href="#memory">记忆系统</a>
+            <a href="#best-practices">最佳实践</a>
+            <a href="#troubleshooting">故障排除</a>
+        </nav>
+
+        <!-- Quick Start -->
+        <section class="section" id="quickstart">
+            <h2>🚀 快速开始</h2>
+            <h3>前提条件</h3>
+            <ul>
+                <li>现代终端模拟器（WezTerm / Alacritty / Ghostty / Kitty / Windows Terminal）</li>
+                <li>LLM 提供商的 API 密钥（或使用免费的 MiMo Auto）</li>
+            </ul>
+            <h3>安装</h3>
+            <p><strong>Mac / Linux（推荐）：</strong></p>
+<pre><code>curl -fsSL https://mimo.xiaomi.com/install | bash</code></pre>
+            <p><strong>Windows / npm：</strong></p>
+<pre><code>npm install -g @mimo-ai/cli</code></pre>
+            <p><strong>Nix：</strong></p>
+<pre><code>nix run github:XiaomiMiMo/MiMo-Code</code></pre>
+            <h3>首次启动</h3>
+            <p>在项目目录中运行 <code>mimocode</code>，首次启动会引导你选择模型接入方式：</p>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>🔥 MiMo Auto</h4>
+                    <p>基于 MiMo-V2.5 的免费通道，零配置即用，支持 100 万 token 上下文</p>
+                </div>
+                <div class="feature-card green">
+                    <h4>🔑 小米 MiMo 平台</h4>
+                    <p>通过 OAuth 登录小米 MiMo 平台</p>
+                </div>
+                <div class="feature-card orange">
+                    <h4>📦 从 Claude Code 导入</h4>
+                    <p>一键迁移已有的 Claude Code 认证配置</p>
+                </div>
+                <div class="feature-card purple">
+                    <h4>⚙️ 自定义 Provider</h4>
+                    <p>添加任何 OpenAI 兼容的 API</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Features -->
+        <section class="section" id="features">
+            <h2>✨ 核心特性</h2>
+            <div class="feature-grid">
+                <div class="feature-card blue">
+                    <h4>🧠 跨会话记忆</h4>
+                    <p>基于 SQLite FTS5 全文搜索的持久化记忆系统。项目记忆、会话检查点、任务进度在重启后自动恢复，无需重新学习项目上下文。</p>
+                </div>
+                <div class="feature-card green">
+                    <h4>📐 智能上下文管理</h4>
+                    <p>自动检查点保存、上下文重建和预算注入。当上下文接近上限时，从最新的检查点和记忆文件中恢复状态，逻辑会话可以无限延伸。</p>
+                </div>
+                <div class="feature-card orange">
+                    <h4>🔄 任务追踪</h4>
+                    <p>树形任务系统（T1, T1.1, T1.2...）自动与检查点集成，会话恢复时任务进度完整保留。</p>
+                </div>
+                <div class="feature-card purple">
+                    <h4>🤖 子代理系统</h4>
+                    <p>主代理可以按需创建子代理，并行工作，支持生命周期追踪、取消和后台执行。</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🎯 Goal 完成度验证</h4>
+                    <p>设定停止条件后，独立审查模型验证是否真正完成，防止提前终止或过度运行。</p>
+                </div>
+                <div class="feature-card blue">
+                    <h4>🧪 Max Mode 并行采样</h4>
+                    <p>每轮并行生成 N 个候选方案（默认 5），由 judge 模型选出最优执行，SWE-Bench Pro 提升 10-20%。</p>
+                </div>
+                <div class="feature-card green">
+                    <h4>🗣️ 语音输入</h4>
+                    <p>实时流式语音输入，通过 <code>/voice</code> 激活，支持增量转录。</p>
+                </div>
+                <div class="feature-card orange">
+                    <h4>💤 Dream & Distill</h4>
+                    <p>Dream 每 7 天自动整理记忆；Distill 每 30 天发现重复工作流并固化为可复用的 skill 或命令。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agents / Modes -->
+        <section class="section" id="agents">
+            <h2>🧩 工作模式（Agents）</h2>
+            <p>按 <code>Tab</code> 键在主代理之间切换。</p>
+            <table>
+                <thead>
+                    <tr><th>Agent</th><th>说明</th><th>适用场景</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>build</strong></td>
+                        <td>默认模式，拥有完整工具权限</td>
+                        <td>日常开发、功能实现、Bug 修复</td>
+                    </tr>
+                    <tr>
+                        <td><strong>plan</strong></td>
+                        <td>只读分析模式，禁用写入/执行</td>
+                        <td>代码探索、方案设计、架构分析</td>
+                    </tr>
+                    <tr>
+                        <td><strong>compose</strong></td>
+                        <td>技能驱动的编排模式，包含 13 个内置技能</td>
+                        <td>TDD、调试、协作开发、代码审查</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Compose 内置技能</h3>
+            <table>
+                <thead>
+                    <tr><th>类别</th><th>技能</th><th>用途</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>测试</td><td><code>compose:tdd</code></td><td>测试驱动开发工作流</td></tr>
+                    <tr><td>调试</td><td><code>compose:debug</code></td><td>系统化调试方法论</td></tr>
+                    <tr><td>调试</td><td><code>compose:verify</code></td><td>完成前验证</td></tr>
+                    <tr><td>协作</td><td><code>compose:plan</code></td><td>撰写实施计划</td></tr>
+                    <tr><td>协作</td><td><code>compose:execute</code></td><td>执行已批准的计划</td></tr>
+                    <tr><td>协作</td><td><code>compose:parallel</code></td><td>派发并行代理</td></tr>
+                    <tr><td>协作</td><td><code>compose:review</code></td><td>请求代码审查</td></tr>
+                    <tr><td>协作</td><td><code>compose:worktree</code></td><td>在 git worktree 中工作</td></tr>
+                    <tr><td>协作</td><td><code>compose:merge</code></td><td>完成开发分支</td></tr>
+                    <tr><td>协作</td><td><code>compose:brainstorm</code></td><td>与用户头脑风暴</td></tr>
+                    <tr><td>协作</td><td><code>compose:feedback</code></td><td>接收并应用审查反馈</td></tr>
+                    <tr><td>协作</td><td><code>compose:subagent</code></td><td>子代理驱动开发</td></tr>
+                    <tr><td>元开发</td><td><code>compose:new-skill</code></td><td>编写新技能</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Slash Commands -->
+        <section class="section" id="slash-commands">
+            <h2>⌨️ 斜杠命令速查</h2>
+            <p>在 TUI 中输入 <code>/</code> 后跟命令名称执行操作。</p>
+            <table>
+                <thead>
+                    <tr><th>命令</th><th>说明</th><th>快捷键</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>/help</code></td><td>显示帮助对话框</td><td><code>ctrl+x h</code></td></tr>
+                    <tr><td><code>/new</code></td><td>开始新会话（别名: <code>/clear</code>）</td><td><code>ctrl+x n</code></td></tr>
+                    <tr><td><code>/sessions</code></td><td>列出会话并切换（别名: <code>/resume</code>, <code>/continue</code>）</td><td><code>ctrl+x l</code></td></tr>
+                    <tr><td><code>/compact</code></td><td>压缩当前会话（别名: <code>/summarize</code>）</td><td><code>ctrl+x c</code></td></tr>
+                    <tr><td><code>/models</code></td><td>列出可用模型</td><td><code>ctrl+x m</code></td></tr>
+                    <tr><td><code>/connect</code></td><td>添加提供商 API 密钥</td><td>—</td></tr>
+                    <tr><td><code>/themes</code></td><td>列出可用主题</td><td><code>ctrl+x t</code></td></tr>
+                    <tr><td><code>/thinking</code></td><td>切换思考/推理块可见性</td><td>—</td></tr>
+                    <tr><td><code>/share</code></td><td>分享当前会话</td><td><code>ctrl+x s</code></td></tr>
+                    <tr><td><code>/unshare</code></td><td>取消分享当前会话</td><td>—</td></tr>
+                    <tr><td><code>/export</code></td><td>导出为 Markdown</td><td><code>ctrl+x x</code></td></tr>
+                    <tr><td><code>/editor</code></td><td>打开外部编辑器编写消息</td><td><code>ctrl+x e</code></td></tr>
+                    <tr><td><code>/init</code></td><td>创建或更新 AGENTS.md 规则文件</td><td><code>ctrl+x i</code></td></tr>
+                    <tr><td><code>/undo</code></td><td>撤销最后一条消息（含文件变更）</td><td><code>ctrl+x u</code></td></tr>
+                    <tr><td><code>/redo</code></td><td>重做已撤销的消息</td><td><code>ctrl+x r</code></td></tr>
+                    <tr><td><code>/details</code></td><td>切换工具执行详情显示</td><td><code>ctrl+x d</code></td></tr>
+                    <tr><td><code>/exit</code></td><td>退出 MiMo Code（别名: <code>/quit</code>, <code>/q</code>）</td><td><code>ctrl+x q</code></td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Built-in Tools -->
+        <section class="section" id="tools">
+            <h2>🔧 内置工具</h2>
+            <p>MiMo Code 内置以下工具，可通过 <code>mimocode.json</code> 的 <code>permission</code> 字段控制权限（allow / ask / deny）。</p>
+            <table>
+                <thead>
+                    <tr><th>工具</th><th>说明</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>bash</code></td><td>执行 shell 命令（npm install, git status 等）</td></tr>
+                    <tr><td><code>read</code></td><td>读取文件内容，支持指定行范围</td></tr>
+                    <tr><td><code>write</code></td><td>创建新文件或覆盖现有文件</td></tr>
+                    <tr><td><code>edit</code></td><td>通过精确字符串替换修改文件（主要编辑方式）</td></tr>
+                    <tr><td><code>grep</code></td><td>正则表达式搜索文件内容（基于 ripgrep）</td></tr>
+                    <tr><td><code>glob</code></td><td>模式匹配查找文件（如 <code>**/*.ts</code>）</td></tr>
+                    <tr><td><code>patch</code></td><td>应用补丁文件到代码库</td></tr>
+                    <tr><td><code>skill</code></td><td>加载 SKILL.md 技能文件</td></tr>
+                    <tr><td><code>todowrite</code></td><td>管理待办事项列表</td></tr>
+                    <tr><td><code>webfetch</code></td><td>获取网页内容</td></tr>
+                    <tr><td><code>websearch</code></td><td>网络搜索（需 MiMo 提供商或启用 EXA）</td></tr>
+                    <tr><td><code>question</code></td><td>执行过程中向用户提问</td></tr>
+                    <tr><td><code>lsp</code></td><td>LSP 代码智能（实验性，需启用）</td></tr>
+                </tbody>
+            </table>
+            <div class="note-box">
+                <strong>💡 权限配置示例</strong>
+                <code>"permission": { "*": "ask", "bash": "allow", "edit": "deny" }</code><br>
+                通配符 <code>*</code> 控制默认策略，单独工具可覆盖。
+            </div>
+        </section>
+
+        <!-- Keybinds -->
+        <section class="section" id="keybinds">
+            <h2>🎹 快捷键</h2>
+            <p>默认前导键为 <code>ctrl+x</code>，先按前导键再按对应键。</p>
+            <table>
+                <thead>
+                    <tr><th>快捷键</th><th>操作</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>Tab</code></td><td>切换 Agent（build / plan / compose）</td></tr>
+                    <tr><td><code>Shift+Tab</code></td><td>反向切换 Agent</td></tr>
+                    <tr><td><code>ctrl+x</code> → <code>n</code></td><td>新会话</td></tr>
+                    <tr><td><code>ctrl+x</code> → <code>l</code></td><td>会话列表</td></tr>
+                    <tr><td><code>ctrl+x</code> → <code>c</code></td><td>压缩会话</td></tr>
+                    <tr><td><code>ctrl+x</code> → <code>m</code></td><td>模型列表</td></tr>
+                    <tr><td><code>ctrl+x</code> → <code>s</code></td><td>分享会话</td></tr>
+                    <tr><td><code>ctrl+x</code> → <code>x</code></td><td>导出会话</td></tr>
+                    <tr><td><code>ctrl+x</code> → <code>u</code></td><td>撤销</td></tr>
+                    <tr><td><code>ctrl+x</code> → <code>r</code></td><td>重做</td></tr>
+                    <tr><td><code>ctrl+t</code></td><td>切换模型变体（开启/关闭推理）</td></tr>
+                    <tr><td><code>F2</code></td><td>切换最近使用的模型</td></tr>
+                    <tr><td><code>ctrl+p</code></td><td>命令面板</td></tr>
+                    <tr><td><code>Escape</code></td><td>中断当前运行</td></tr>
+                    <tr><td><code>ctrl+c / ctrl+d</code></td><td>退出</td></tr>
+                </tbody>
+            </table>
+            <h3>文本编辑快捷键</h3>
+            <table>
+                <thead>
+                    <tr><th>快捷键</th><th>操作</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>ctrl+a / ctrl+e</code></td><td>行首 / 行尾</td></tr>
+                    <tr><td><code>ctrl+k</code></td><td>删除到行尾</td></tr>
+                    <tr><td><code>ctrl+u</code></td><td>删除到行首</td></tr>
+                    <tr><td><code>ctrl+w</code></td><td>删除前一个单词</td></tr>
+                    <tr><td><code>alt+b / alt+f</code></td><td>按单词移动光标</td></tr>
+                    <tr><td><code>Shift+Enter</code></td><td>输入换行</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Configuration -->
+        <section class="section" id="config">
+            <h2>⚙️ 配置</h2>
+            <p>配置文件位置：<code>.mimocode/mimocode.json</code>（项目级）或 <code>~/.config/mimocode/mimocode.json</code>（全局）。</p>
+            <h3>完整配置示例</h3>
+<pre><code>{
+  "$schema": "https://mimo.xiaomi.com//config.json",
+  "model": "mimo/mimo-v2.5-pro",
+  "small_model": "mimo/mimo-v2.5-pro",
+  "default_agent": "build",
+  "share": "manual",
+  "autoupdate": true,
+
+  "provider": {
+    "anthropic": {
+      "options": { "timeout": 600000, "setCacheKey": true }
+    }
+  },
+
+  "permission": {
+    "*": "ask",
+    "bash": "allow",
+    "edit": "deny"
+  },
+
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "tail_turns": 2
+  },
+
+  "watcher": {
+    "ignore": ["node_modules/**", "dist/**"]
+  },
+
+  "instructions": ["CONTRIBUTING.md"],
+
+  "experimental": {
+    "maxMode": false
+  }
+}</code></pre>
+            <h3>关键字段说明</h3>
+            <table>
+                <thead>
+                    <tr><th>字段</th><th>说明</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>model</code></td><td>默认模型，格式 <code>provider_id/model_id</code></td></tr>
+                    <tr><td><code>default_agent</code></td><td>默认代理（build / plan / compose）</td></tr>
+                    <tr><td><code>permission</code></td><td>工具权限（allow / ask / deny），支持通配符</td></tr>
+                    <tr><td><code>compaction</code></td><td>上下文压缩策略（auto / prune / tail_turns）</td></tr>
+                    <tr><td><code>instructions</code></td><td>注入额外指令文件路径或 glob</td></tr>
+                    <tr><td><code>share</code></td><td>manual / auto / disabled</td></tr>
+                    <tr><td><code>autoupdate</code></td><td>true / false / "notify"</td></tr>
+                    <tr><td><code>experimental.maxMode</code></td><td>启用并行采样选优（实验性）</td></tr>
+                </tbody>
+            </table>
+            <div class="tip-box">
+                <strong>💡 变量替换</strong>
+                配置值支持 <code>{env:VAR}</code> 和 <code>{file:path}</code> 占位符，方便引用环境变量和密钥文件。
+            </div>
+        </section>
+
+        <!-- Memory System -->
+        <section class="section" id="memory">
+            <h2>🧠 记忆系统</h2>
+            <p>MiMo Code 采用四层记忆架构，越上层越精炼持久，越下层越完整庞大。</p>
+            <div class="feature-grid">
+                <div class="feature-card blue">
+                    <h4>Session 记忆</h4>
+                    <p><code>checkpoint.md</code> — 当前逻辑会话的完整工作状态，由独立 writer subagent 自动维护。11 个结构化字段：意图、下一步、任务树、涉及文件、错误等。</p>
+                </div>
+                <div class="feature-card green">
+                    <h4>Project 记忆</h4>
+                    <p><code>MEMORY.md</code> — 项目级持久知识：架构决定、用户规则、技术事实。跨 session 稳定的内容从 session 层提升至此。</p>
+                </div>
+                <div class="feature-card orange">
+                    <h4>Global 记忆</h4>
+                    <p>用户级偏好，跨项目生效。</p>
+                </div>
+                <div class="feature-card purple">
+                    <h4>History</h4>
+                    <p>SQLite 完整轨迹存储，每条消息和工具调用原文。当结构化记忆找不到细节时向下回溯。</p>
+                </div>
+            </div>
+            <h3>检查点机制</h3>
+            <ul>
+                <li>在已配置预算的 20%、45%、70% 处触发检查点</li>
+                <li>每次触发都是对前一次的增量更新</li>
+                <li>Writer subagent 独立于主 Agent 执行，互不干扰</li>
+                <li>重建时将持久化文件组装为分层 prompt 注入新窗口（约 65K token 以内）</li>
+            </ul>
+            <div class="note-box">
+                <strong>📝 notes.md — 唯一的写入通道</strong>
+                主 Agent 只能读取结构化文件，但可以随时 append 到 <code>notes.md</code>。Writer 在每次 checkpoint 时读取、路由到对应字段后清空。
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section class="section" id="best-practices">
+            <h2>🏆 最佳实践</h2>
+
+            <h3>1. 善用 Plan 模式先规划再执行</h3>
+            <p>对于复杂任务，先切换到 <code>plan</code> 模式（<code>Tab</code>），让 AI 分析代码库并制定方案。确认后再切回 <code>build</code> 执行。这可以避免不必要的文件修改。</p>
+
+            <h3>2. 利用 Goal 防止提前终止</h3>
+            <p>对于自动化任务，设置明确的 Goal 停止条件（如"所有测试通过且代码已提交"），让独立验证模型确保任务真正完成。</p>
+
+            <h3>3. 使用 AGENTS.md 定义项目规则</h3>
+            <p>运行 <code>/init</code> 生成 <code>AGENTS.md</code>，在其中定义项目特定的编码规范、架构约束和偏好。这些规则会在每次会话中自动注入。</p>
+
+            <h3>4. 合理配置权限</h3>
+            <p>建议将 <code>bash</code> 和 <code>edit</code> 设为 <code>"ask"</code>，让 AI 在执行危险操作前确认。对于信任的项目可以设为 <code>"allow"</code>。</p>
+<pre><code>{
+  "permission": {
+    "*": "allow",
+    "bash": "ask",
+    "edit": "ask"
+  }
+}</code></pre>
+
+            <h3>5. 利用 Compose 模式进行 TDD</h3>
+            <p>切换到 <code>compose</code> 模式后，使用 <code>compose:tdd</code> 技能进行测试驱动开发。先写测试，再实现功能，自动验证。</p>
+
+            <h3>6. 定期整理记忆</h3>
+            <p>Dream（每 7 天自动触发）和 Distill（每 30 天自动触发）会自动维护记忆质量。你也可以手动运行 <code>/dream</code> 整理记忆。</p>
+
+            <h3>7. 使用 Undo/Redo 安全回滚</h3>
+            <p><code>/undo</code> 会撤销最后一条消息及所有文件变更（基于 Git），<code>/redo</code> 重做。确保项目是 Git 仓库即可使用。</p>
+
+            <h3>8. 利用 Subagent 并行处理</h3>
+            <p>对于大型任务，子代理可以并行处理不同模块。主代理负责协调，子代理独立执行，提高整体效率。</p>
+
+            <h3>9. 启用 Max Mode 提升准确率</h3>
+            <p>对于关键任务，在配置中启用 <code>"experimental": { "maxMode": true }</code>，并行生成 5 个候选方案由 judge 选出最优。</p>
+
+            <h3>10. 利用 MCP 扩展能力</h3>
+            <p>通过 MCP 服务器集成外部工具（数据库、API、第三方服务），将 MiMo Code 的能力扩展到代码编辑之外。</p>
+        </section>
+
+        <!-- Troubleshooting -->
+        <section class="section" id="troubleshooting">
+            <h2>🛠️ 故障排除</h2>
+
+            <h3>Shift+Enter 无法换行</h3>
+            <p>某些终端默认不发送修饰键 Enter。Windows Terminal 需在 <code>settings.json</code> 中添加：</p>
+<pre><code>"actions": [
+  {
+    "command": { "action": "sendInput", "input": "\u001b[13;2u" },
+    "id": "User.sendInput.ShiftEnterCustom"
+  }
+]
+"keybindings": [
+  { "keys": "shift+enter", "id": "User.sendInput.ShiftEnterCustom" }
+]</code></pre>
+
+            <h3>搜索不到被 .gitignore 排除的文件</h3>
+            <p>在项目根目录创建 <code>.ignore</code> 文件，添加允许的路径：</p>
+<pre><code>!node_modules/
+!dist/
+!build/</code></pre>
+
+            <h3>undo/redo 不工作</h3>
+            <p>确保项目是一个 Git 仓库。undo/redo 通过 Git 管理文件变更。</p>
+
+            <h3>websearch 不可用</h3>
+            <p>需要使用 MiMo 提供商，或设置环境变量 <code>MIMOCODE_ENABLE_EXA=1</code>。</p>
+
+            <div class="warn-box">
+                <strong>⚠️ LSP 工具为实验性功能</strong>
+                需要设置 <code>MIMOCODE_EXPERIMENTAL_LSP_TOOL=true</code> 或 <code>MIMOCODE_EXPERIMENTAL=true</code> 才能启用。
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <section class="section" style="text-align: center; color: var(--text-secondary); font-size: 0.88rem;">
+            <p>
+                本文档基于 <a href="https://github.com/XiaomiMiMo/MiMo-Code" target="_blank">MiMo-Code GitHub 仓库</a> 和 <a href="https://mimo.xiaomi.com/zh/mimocode/start" target="_blank">官方文档</a> 整理。<br>
+                MiMo Code 由小米 MiMo 团队开发，基于 <a href="https://github.com/anomalyco/opencode" target="_blank">OpenCode</a> 构建，MIT 协议开源。
+            </p>
+        </section>
+    </div>
+</body>
+</html>
