@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pi Agent Harness — 原理说明</title>
+<style>
+  .pi-content {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --bg-hover: #1c2333;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --accent3: #d2a8ff;
+    --accent4: #f0883e;
+    --radius: 12px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  }
+  .pi-content * { margin: 0; padding: 0; box-sizing: border-box; }
+  .pi-content {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 80px 24px 60px;
+    background: linear-gradient(180deg, #0d1117 0%, #161b22 100%);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 50% 50%, rgba(88,166,255,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-logo {
+    font-size: 64px;
+    font-weight: 800;
+    letter-spacing: -3px;
+    background: linear-gradient(135deg, #58a6ff, #d2a8ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .hero h1 {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .hero p {
+    font-size: 15px;
+    color: var(--text-dim);
+    max-width: 640px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(88,166,255,0.12);
+    color: var(--accent);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    border: 1px solid rgba(88,166,255,0.2);
+  }
+
+  /* Nav */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    overflow-x: auto;
+    white-space: nowrap;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav a {
+    display: inline-block;
+    padding: 14px 18px;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .nav a:hover { color: var(--text); border-bottom-color: var(--accent); }
+
+  /* Layout */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 24px;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 64px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-header .icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .section-header h2 {
+    font-size: 22px;
+    font-weight: 600;
+  }
+  .section > p {
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    font-size: 15px;
+  }
+
+  /* Cards */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover {
+    border-color: rgba(88,166,255,0.3);
+    transform: translateY(-2px);
+  }
+  .card h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--accent);
+  }
+  .card p, .card ul {
+    font-size: 13.5px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+  .card ul { padding-left: 18px; }
+  .card ul li { margin-bottom: 4px; }
+
+  /* Code blocks */
+  pre {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  code {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    background: rgba(88,166,255,0.08);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent2);
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    color: var(--text);
+  }
+  .code-comment { color: #6e7681; }
+  .code-keyword { color: #ff7b72; }
+  .code-string { color: #a5d6ff; }
+  .code-fn { color: #d2a8ff; }
+  .code-type { color: #79c0ff; }
+  .code-literal { color: #79c0ff; }
+
+  /* Package strip */
+  .pkg-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .pkg-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px;
+    text-align: center;
+  }
+  .pkg-item .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .pkg-item h4 {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  .pkg-item p {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  /* Architecture diagram */
+  .arch {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 24px;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .arch-layer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 8px 0;
+  }
+  .arch-box {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid;
+  }
+  .arch-box.l1 { background: rgba(88,166,255,0.1); border-color: rgba(88,166,255,0.3); color: #58a6ff; }
+  .arch-box.l2 { background: rgba(63,185,80,0.1); border-color: rgba(63,185,80,0.3); color: #3fb950; }
+  .arch-box.l3 { background: rgba(210,168,255,0.1); border-color: rgba(210,168,255,0.3); color: #d2a8ff; }
+  .arch-box.l4 { background: rgba(240,136,62,0.1); border-color: rgba(240,136,62,0.3); color: #f0883e; }
+  .arch-arrow { color: var(--text-dim); font-size: 20px; }
+  .arch-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 12px 0 6px;
+  }
+
+  /* Principles */
+  .principle {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .principle h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .principle p {
+    font-size: 13.5px;
+    color: var(--text-dim);
+  }
+
+  /* Table */
+  .table-wrap {
+    overflow-x: auto;
+    margin-bottom: 20px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  th {
+    text-align: left;
+    padding: 10px 14px;
+    background: var(--bg-card);
+    border-bottom: 2px solid var(--border);
+    color: var(--text-dim);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+  td:first-child { color: var(--text); font-weight: 500; }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 40px 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .hero { padding: 48px 16px 40px; }
+    .hero-logo { font-size: 48px; }
+    .container { padding: 32px 16px; }
+    .arch-layer { flex-direction: column; }
+    .arch-arrow { transform: rotate(90deg); }
+  }
+
+  /* Highlight */
+  .highlight {
+    background: rgba(210,168,255,0.06);
+    border-left: 3px solid var(--accent3);
+    padding: 16px 20px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+</style>
+</head>
+<body>
+<div class="pi-content">
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-badge">开源 · TypeScript · MIT</div>
+  <div class="hero-logo">π</div>
+  <h1>Pi Agent Harness</h1>
+  <p>极简终端编码代理框架。核心保持小巧，通过 TypeScript 扩展、技能、提示模板、主题和 Pi 包进行扩展。</p>
+</div>
+
+<!-- Nav -->
+<nav class="nav">
+  <a href="#overview">概览</a>
+  <a href="#arch">架构</a>
+  <a href="#packages">核心包</a>
+  <a href="#pi-ai">pi-ai</a>
+  <a href="#agent-core">agent-core</a>
+  <a href="#pi-tui">pi-tui</a>
+  <a href="#coding-agent">coding-agent</a>
+  <a href="#philosophy">设计哲学</a>
+</nav>
+
+<div class="container">
+
+<!-- Overview -->
+<section class="section" id="overview">
+  <div class="section-header">
+    <div class="icon" style="background:rgba(88,166,255,0.12);">📋</div>
+    <h2>项目概览</h2>
+  </div>
+  <p><strong>Pi</strong>（π）是一个由 <a href="https://github.com/badlogic" style="color:var(--accent);text-decoration:none;">Mario Zechner</a> 创建的极简终端编码代理框架，托管在 <a href="https://github.com/earendil-works/pi" style="color:var(--accent);text-decoration:none;">Earendil Works</a> 组织下。目标是构建一个核心紧凑、可高度扩展的编码代理。与 Claude Code、Codex、Amp 等现有工具不同，Pi 刻意保持小体量，提供精确的上下文工程控制，并且拥有超小系统提示（&lt;1000 tokens）。</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>⭐ 50,800+ Stars</h3>
+      <p>GitHub 上快速增长的开源项目，社区活跃。</p>
+    </div>
+    <div class="card">
+      <h3>📦 4 个核心包</h3>
+      <p>pi-ai、pi-agent-core、pi-tui、pi-coding-agent 组成完整技术栈。</p>
+    </div>
+    <div class="card">
+      <h3>🤖 多模型/多供应商</h3>
+      <p>支持 Anthropic、OpenAI、Google、xAI、Groq、Cerebras 等 10+ 供应商。</p>
+    </div>
+    <div class="card">
+      <h3>🔧 可扩展</h3>
+      <p>通过 TypeScript 扩展、Skills、AGENTS.md、主题、Pi 包自定义。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Architecture -->
+<section class="section" id="arch">
+  <div class="section-header">
+    <div class="icon" style="background:rgba(63,185,80,0.12);">🏗️</div>
+    <h2>系统架构</h2>
+  </div>
+  <p>Pi 采用四层分层架构设计。每一层都专注于单一职责，下层为上层提供抽象能力。</p>
+
+  <div class="arch">
+    <div class="arch-label">用户界面层</div>
+    <div class="arch-layer">
+      <div class="arch-box l4">pi-coding-agent</div>
+      <div class="arch-arrow">▲</div>
+      <div class="arch-box l4">CLI / TUI</div>
+    </div>
+
+    <div class="arch-label">代理运行时层</div>
+    <div class="arch-layer">
+      <div class="arch-box l3">pi-agent-core</div>
+      <div class="arch-arrow">▲</div>
+      <div class="arch-box l3">pi-tui</div>
+    </div>
+
+    <div class="arch-label">AI 抽象层</div>
+    <div class="arch-layer">
+      <div class="arch-box l2">pi-ai (Unified LLM API)</div>
+    </div>
+
+    <div class="arch-label">模型供应商层</div>
+    <div class="arch-layer">
+      <div class="arch-box l1">Anthropic</div>
+      <div class="arch-box l1">OpenAI</div>
+      <div class="arch-box l1">Google</div>
+      <div class="arch-box l1">xAI</div>
+      <div class="arch-box l1">OpenRouter</div>
+      <div class="arch-box l1">更多...</div>
+    </div>
+  </div>
+
+  <div class="pkg-strip">
+    <div class="pkg-item">
+      <span class="tag" style="background:rgba(88,166,255,0.12);color:#58a6ff;">pi-ai</span>
+      <h4>统一 LLM API</h4>
+      <p>多供应商抽象层，支持流式、工具调用、推理</p>
+    </div>
+    <div class="pkg-item">
+      <span class="tag" style="background:rgba(63,185,80,0.12);color:#3fb950;">pi-agent-core</span>
+      <h4>代理核心</h4>
+      <p>代理循环、工具执行、状态管理、事件流</p>
+    </div>
+    <div class="pkg-item">
+      <span class="tag" style="background:rgba(210,168,255,0.12);color:#d2a8ff;">pi-tui</span>
+      <h4>终端 UI</h4>
+      <p>差分渲染 TUI 框架、几乎无闪烁</p>
+    </div>
+    <div class="pkg-item">
+      <span class="tag" style="background:rgba(240,136,62,0.12);color:#f0883e;">pi-coding-agent</span>
+      <h4>编码代理 CLI</h4>
+      <p>会话管理、AGENTS.md、主题、扩展系统</p>
+    </div>
+  </div>
+</section>
+
+<!-- Core Packages -->
+<section class="section" id="packages">
+  <div class="section-header">
+    <div class="icon" style="background:rgba(210,168,255,0.12);">📦</div>
+    <h2>核心包详解</h2>
+  </div>
+
+  <!-- pi-ai -->
+  <h3 id="pi-ai" style="font-size:18px;margin-bottom:12px;color:var(--accent);">1. pi-ai — 统一 LLM API</h3>
+  <p>pi-ai 是一个轻量级、多供应商的 LLM 抽象库，提供了统一的接口来访问不同的大语言模型供应商。它只包含四种核心 API：文本流、完整响应、图片生成和嵌入。</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>🌐 多供应商支持</h3>
+      <p>原生适配 Anthropic Messages API、OpenAI Completions/Responses API、Google Generative AI API。兼容任何 OpenAI-compatible 端点（vLLM、Ollama、llama.cpp、LM Studio 等）。</p>
+    </div>
+    <div class="card">
+      <h3>🔄 跨供应商上下文切换</h3>
+      <p>设计之初就支持在会话中无缝切换模型/供应商。将 Anthropic 的思维链转换为 &lt;thinking&gt; 标签内容块，使另一模型能理解上下文。</p>
+    </div>
+    <div class="card">
+      <h3>🧰 TypeBox 工具定义</h3>
+      <p>使用 TypeBox schema 定义工具参数，自动验证并在失败时返回详细错误给模型重试。工具结果可拆分：一部分给 LLM 阅读，一部分给 UI 渲染。</p>
+    </div>
+    <div class="card">
+      <h3>🛑 完整的取消支持</h3>
+      <p>使用 AbortController 在整个管道中支持取消，包括工具调用。取消后仍可获取部分结果。</p>
+    </div>
+  </div>
+
+  <p style="margin-top:12px;">pi-ai 的四大 API：</p>
+  <div class="table-wrap">
+    <table>
+      <tr><th>API</th><th>说明</th></tr>
+      <tr><td>stream()</td><td>流式响应，逐 token 输出事件（text_delta、tool_call、tool_result、error、done）</td></tr>
+      <tr><td>complete()</td><td>完整响应，等待最终结果返回</td></tr>
+      <tr><td>generateImages()</td><td>图片生成，一次性 API</td></tr>
+      <tr><td>embed()</td><td>文本嵌入</td></tr>
+    </table>
+  </div>
+
+  <p>模型注册表自动从 OpenRouter 和 models.dev 解析，包含 token 成本和能力信息（图片输入、推理支持等）。未注册的模型可手动定义：</p>
+  <pre><code><span class="code-keyword">const</span> ollamaModel: Model&lt;<span class="code-string">'openai-completions'</span>&gt; = {
+  id: <span class="code-string">'llama-3.1-8b'</span>,
+  name: <span class="code-string">'Llama 3.1 8B (Ollama)'</span>,
+  api: <span class="code-string">'openai-completions'</span>,
+  provider: <span class="code-string">'ollama'</span>,
+  baseUrl: <span class="code-string">'http://localhost:11434/v1'</span>,
+  reasoning: <span class="code-keyword">false</span>,
+  cost: { input: <span class="code-literal">0</span>, output: <span class="code-literal">0</span>, cacheRead: <span class="code-literal">0</span>, cacheWrite: <span class="code-literal">0</span> },
+  contextWindow: <span class="code-literal">128000</span>,
+};</code></pre>
+
+  <!-- agent-core -->
+  <h3 id="agent-core" style="font-size:18px;margin:32px 0 12px;color:var(--accent2);">2. pi-agent-core — 代理运行时</h3>
+  <p>pi-agent-core 在 pi-ai 之上构建了完整的代理循环（Agent Loop），处理工具执行、状态管理和事件流。</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>🔄 代理循环</h3>
+      <p>处理完整的编排流程：处理用户消息 → 执行工具调用 → 将结果反馈给 LLM → 重复，直到模型产生不含工具调用的最终响应。</p>
+    </div>
+    <div class="card">
+      <h3>📨 消息队列</h3>
+      <p>每次模型响应后，通过回调检查待处理消息并注入。支持单条注入和批量注入两种模式。</p>
+    </div>
+    <div class="card">
+      <h3>🔌 传输抽象</h3>
+      <p>提供传输层抽象，支持直接运行代理或通过代理（proxy）运行，灵活性高。</p>
+    </div>
+    <div class="card">
+      <h3>📎 附件处理</h3>
+      <p>内置图片和文档的附件处理能力，自动转换为目标供应商的原生格式。</p>
+    </div>
+  </div>
+
+  <!-- pi-tui -->
+  <h3 id="pi-tui" style="font-size:18px;margin:32px 0 12px;color:var(--accent3);">3. pi-tui — 差分渲染终端 UI</h3>
+  <p>pi-tui 是一个自建的轻量级 TUI 框架，采用保留模式（Retained Mode）和差分渲染（Differential Rendering）实现近乎无闪烁的终端体验。</p>
+
+  <div class="principle">
+    <h3>工作原理</h3>
+    <p>组件是一个包含 <code>render(width)</code> 方法和可选的 <code>handleInput(data)</code> 方法的对象。Container 垂直排列子组件并收集它们的渲染行。TUI 类维持一个"后缓冲"，记录之前写入终端的内容。每次更新时，与当前渲染结果逐行比较，只重写差异部分。</p>
+  </div>
+
+  <div class="principle">
+    <h3>差分渲染算法</h3>
+    <p><strong>首次渲染：</strong> 所有行直接输出到终端。<br>
+    <strong>宽度变化：</strong> 完全清除屏幕并重新渲染（软换行变化）。<br>
+    <strong>正常更新：</strong> 找到与屏幕内容不同的第一行，将光标移到该行，从该行开始重新渲染到末尾。<br>
+    <strong>视口外变化：</strong> 如果第一个变化行在当前可见视口上方（用户已向上滚动），则执行完全清除和重新渲染。</p>
+  </div>
+
+  <div class="principle">
+    <h3>防闪烁</h3>
+    <p>所有渲染操作包裹在同步输出转义序列（<code>CSI ?2026h</code> / <code>CSI ?2026l</code>）中，告诉终端缓冲所有输出并原子化显示。在 Ghostty、iTerm2 等现代终端中完全无闪烁。</p>
+  </div>
+
+  <!-- coding-agent -->
+  <h3 id="coding-agent" style="font-size:18px;margin:32px 0 12px;color:var(--accent4);">4. pi-coding-agent — CLI 编码代理</h3>
+  <p>这是终端用户直接使用的 CLI 工具。将所有组件组合在一起，提供完整的编码代理体验。</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>💻 四模式运行</h3>
+      <p>交互式终端模式、print 模式（输出到 stdout）、JSON 模式（结构化输出）、RPC 模式（进程集成）。</p>
+    </div>
+    <div class="card">
+      <h3>📂 会话管理</h3>
+      <p>支持 continue、resume 与会话分支（从历史消息回退并创建新分支）。HTML 导出功能。</p>
+    </div>
+    <div class="card">
+      <h3>📝 AGENTS.md</h3>
+      <p>支持全局和项目级别的 AGENTS.md 文件，分层加载到系统提示中。可自定义或完全替换系统提示。</p>
+    </div>
+    <div class="card">
+      <h3>🎨 扩展系统</h3>
+      <p>TypeScript 扩展、Skills（技能）、提示模板（自定义斜杠命令）、主题（可热重载）、Pi 包（npm 分发）。</p>
+    </div>
+  </div>
+
+  <p>Pi CLI 的核心工具集仅 4 个（另有一些只读工具可选），系统提示 + 工具定义合计 <strong>不到 1000 tokens</strong>：</p>
+  <div class="table-wrap">
+    <table>
+      <tr><th>工具</th><th>功能</th></tr>
+      <tr><td>read</td><td>读取文件内容（文本和图片），支持 offset/limit</td></tr>
+      <tr><td>write</td><td>写入文件，自动创建父目录</td></tr>
+      <tr><td>edit</td><td>精确替换文件内容（基于旧文本匹配）</td></tr>
+      <tr><td>bash</td><td>执行 bash 命令，可选超时</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- Design Philosophy -->
+<section class="section" id="philosophy">
+  <div class="section-header">
+    <div class="icon" style="background:rgba(240,136,62,0.12);">🧠</div>
+    <h2>设计哲学</h2>
+  </div>
+  <p>Pi 在设计和实现上与主流编码代理有着显著的不同之处。</p>
+
+  <div class="principle">
+    <h3>🎯 极简系统提示</h3>
+    <p>Pi 的系统提示不到 1000 tokens，远少于 Claude Code 的数万 tokens。核心信念是：前沿模型经过充分的 RL 训练，从根本上理解编码代理的任务，不需要冗长的提示工程。Terminal-Bench 基准测试表明，极简提示在性能上并不输于巨型提示。</p>
+  </div>
+
+  <div class="principle">
+    <h3>🦅 YOLO 模式（默认）</h3>
+    <p>Pi 默认具有完全的 filesystem 访问权限和任意命令执行权限，没有权限检查和安全护栏。Pi 团队认为：一旦代理能写代码和执行代码，安全措施基本上是"安全剧场"。真正的解决方案是在容器中运行，而不是用假护栏麻痹用户。Simon Willison 提出的"双 LLM 模式"也承认引入巨大的实现复杂性却无法根本解决问题。</p>
+  </div>
+
+  <div class="principle">
+    <h3>❌ 不做内置待办列表</h3>
+    <p>Pi 认为待办列表通常更多是混淆模型而非帮助。如果需要任务追踪，建议写入 TODO.md 文件，由代理自行读写。简单、可见、可版本控制。</p>
+  </div>
+
+  <div class="principle">
+    <h3>❌ 不做内置规划模式</h3>
+    <p>Pi 没有"规划模式"。让用户直接告诉代理思考问题而不修改文件就足够了。跨会话的持久规划写入 PLAN.md 文件。如果确实需要限制代理，可以使用 <code>--tools read,grep,find,ls</code> 限制工具集。</p>
+  </div>
+
+  <div class="principle">
+    <h3>❌ 不支持 MCP</h3>
+    <p>Pi 明确不支持 MCP（Model Context Protocol）。作者认为 MCP server 将大量工具描述注入上下文中（Playwright MCP 占用 13.7k tokens，Chrome DevTools MCP 占用 18k tokens），浪费昂贵的上下文窗口。替代方案：构建简单的 CLI 工具 + README 文件，代理按需读取 README 了解用法，通过 bash 直接调用。实现了渐进式上下文加载。</p>
+  </div>
+
+  <div class="principle">
+    <h3>❌ 不支持后台 bash</h3>
+    <p>Pi 的 bash 工具以同步模式运行，没有内置的后台进程管理。作者认为后台进程管理增加了不必要的复杂性，推荐使用 tmux 来管理长时间运行的进程（开发服务器、LLDB 调试会话等），既能获得完整的可观测性，又能与代理协作调试。</p>
+  </div>
+
+  <div class="principle">
+    <h3>❌ 不支持子代理</h3>
+    <p>Pi 没有专用的子代理工具。作者认为子代理通常是"没有提前规划"的信号。如果需要在会话内收集上下文，建议先单独开一个会话，生成一份上下文工件，再在下一个会话中使用。这样你能获得完整的可观测性和控制力。如果确实需要子代理，可以让 Pi 通过 bash 自我启动。</p>
+  </div>
+
+  <div class="principle">
+    <h3>📊 可观测性优先</h3>
+    <p>Pi 的设计原则之一：用户应该能检查与模型交互的每一个方面。没有黑盒子，没有隐藏的子代理。完整的会话格式文档化，易于后处理，便于构建替代 UI。</p>
+  </div>
+
+  <div class="principle">
+    <h3>🔗 上下文工程</h3>
+    <p>作者认为精确控制进入模型上下文的内容是获得更好输出的关键。现有工具在用户背后注入内容且不在 UI 中显示，使得上下文工程极为困难或不可能。Pi 的 AGENTS.md 系统让用户完全掌控上下文。</p>
+  </div>
+
+  <div class="highlight">
+    <strong>一句话总结 Pi 的设计哲学：</strong> 如果一个功能不是作者个人需要的，它就不会被实现。Pi 是有主见的工具，不试图讨好所有人。如果你需要不同的工作方式，作者鼓励你 fork 项目。
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="section">
+  <div class="section-header">
+    <div class="icon" style="background:rgba(88,166,255,0.12);">⚙️</div>
+    <h2>工作流程</h2>
+  </div>
+
+  <pre><code><span class="code-comment"># 1. 安装 Pi</span>
+npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+
+<span class="code-comment"># 2. 在项目目录中启动</span>
+pi
+
+<span class="code-comment"># 3. 登录或设置 API Key</span>
+/login                         <span class="code-comment"># 订阅式供应商</span>
+export ANTHROPIC_API_KEY=...   <span class="code-comment"># 或直接设置环境变量</span></code></pre>
+
+  <p>一个典型的 Pi 使用流程如下：</p>
+
+  <div class="arch" style="text-align:left;padding:24px;">
+    <div style="margin-bottom:16px;">
+      <span style="color:var(--accent);font-weight:600;">① 用户输入提示</span>
+      <p style="font-size:13px;color:var(--text-dim);margin-top:4px;">用户在 TUI 编辑器中输入消息，支持模糊文件搜索、路径补全、拖放和多行粘贴。</p>
+    </div>
+    <div style="margin-bottom:16px;">
+      <span style="color:var(--accent2);font-weight:600;">② 代理循环启动</span>
+      <p style="font-size:13px;color:var(--text-dim);margin-top:4px;">pi-agent-core 将系统提示 + AGENTS.md + 用户消息发送给 pi-ai，pi-ai 路由到当前配置的 LLM 供应商。</p>
+    </div>
+    <div style="margin-bottom:16px;">
+      <span style="color:var(--accent3);font-weight:600;">③ 工具执行</span>
+      <p style="font-size:13px;color:var(--text-dim);margin-top:4px;">LLM 返回工具调用（read、write、edit、bash），代理执行并将结果反馈给 LLM，循环直到 LLM 产生最终文本响应。</p>
+    </div>
+    <div style="margin-bottom:16px;">
+      <span style="color:var(--accent4);font-weight:600;">④ 差分渲染</span>
+      <p style="font-size:13px;color:var(--text-dim);margin-top:4px;">pi-tui 使用差分渲染算法，只更新终端中变化的部分，提供几乎无闪烁的体验。</p>
+    </div>
+    <div>
+      <span style="color:var(--accent);font-weight:600;">⑤ 会话持久化</span>
+      <p style="font-size:13px;color:var(--text-dim);margin-top:4px;">每次交互写入会话日志，支持 continue、resume、branching。可导出 HTML。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Context Handoff example -->
+<section class="section">
+  <div class="section-header">
+    <div class="icon" style="background:rgba(63,185,80,0.12);">🔄</div>
+    <h2>跨模型上下文传递</h2>
+  </div>
+  <p>这是 Pi 最独特的功能之一——在会话中无缝切换 LLM 供应商：</p>
+
+  <pre><code><span class="code-keyword">import</span> { getModel, complete, Context } <span class="code-keyword">from</span> <span class="code-string">'@mariozechner/pi-ai'</span>;
+
+<span class="code-comment">// 先使用 Claude</span>
+<span class="code-keyword">const</span> claude = getModel(<span class="code-string">'anthropic'</span>, <span class="code-string">'claude-sonnet-4-5'</span>);
+<span class="code-keyword">const</span> context: Context = { messages: [{ role: <span class="code-string">'user'</span>, content: <span class="code-string">'25 × 18 = ?'</span> }] };
+
+<span class="code-keyword">const</span> claudeResponse = <span class="code-keyword">await</span> complete(claude, context, { thinkingEnabled: <span class="code-keyword">true</span> });
+context.messages.push(claudeResponse);
+
+<span class="code-comment">// 切换到 GPT —— Claude 的思维链转为 &lt;thinking&gt; 标签文本</span>
+<span class="code-keyword">const</span> gpt = getModel(<span class="code-string">'openai'</span>, <span class="code-string">'gpt-5.1-codex'</span>);
+context.messages.push({ role: <span class="code-string">'user'</span>, content: <span class="code-string">'结果正确吗？'</span> });
+<span class="code-keyword">const</span> gptResponse = <span class="code-keyword">await</span> complete(gpt, context);
+
+<span class="code-comment">// 切换到 Gemini</span>
+<span class="code-keyword">const</span> gemini = getModel(<span class="code-string">'google'</span>, <span class="code-string">'gemini-2.5-flash'</span>);
+context.messages.push({ role: <span class="code-string">'user'</span>, content: <span class="code-string">'刚才的问题是什么？'</span> });
+<span class="code-keyword">const</span> geminiResponse = <span class="code-keyword">await</span> complete(gemini, context);
+
+<span class="code-comment">// 序列化上下文为 JSON（存储或传输）</span>
+<span class="code-keyword">const</span> serialized = JSON.stringify(context);</code></pre>
+</section>
+
+<!-- Eco-system -->
+<section class="section">
+  <div class="section-header">
+    <div class="icon" style="background:rgba(210,168,255,0.12);">🌐</div>
+    <h2>生态系统</h2>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>📦 Pi 包目录</h3>
+      <p>社区贡献的扩展、技能、提示模板和主题发布在 <a href="https://pi.dev/packages" style="color:var(--accent);">pi.dev/packages</a>，通过 <code>pi install npm:@user/package</code> 安装。</p>
+    </div>
+    <div class="card">
+      <h3>💬 pi-chat</h3>
+      <p>将 Discord 和 Telegram 频道桥接到沙箱化 Pi 会话。每个频道获得独立的 <a href="https://github.com/earendil-works/gondolin" style="color:var(--accent);">Gondolin</a> 微 VM。</p>
+    </div>
+    <div class="card">
+      <h3>📤 会话共享</h3>
+      <p>通过 <code>badlogic/pi-share-hf</code> 将编码代理会话发布到 Hugging Face，帮助改进编码代理的真实世界数据。</p>
+    </div>
+    <div class="card">
+      <h3>🏢 Earendil 公司</h3>
+      <p>Pi 由 <a href="https://earendil.com" style="color:var(--accent);">Earendil</a> 公司维护。企业级功能计划闭源收费以资助开发。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Tech stack -->
+<section class="section">
+  <div class="section-header">
+    <div class="icon" style="background:rgba(240,136,62,0.12);">🛠️</div>
+    <h2>技术栈</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>层次</th><th>技术</th></tr>
+      <tr><td>语言</td><td>TypeScript（全栈）</td></tr>
+      <tr><td>运行时</td><td>Node.js</td></tr>
+      <tr><td>LLM 接入</td><td>原生 HTTP（直接对接供应商 API，不依赖 Vercel AI SDK）</td></tr>
+      <tr><td>工具 Schema</td><td>TypeBox (@sinclair/typebox) + AJV 校验</td></tr>
+      <tr><td>终端</td><td>自建 TUI 框架（pi-tui）</td></tr>
+      <tr><td>终端渲染</td><td>ANSI 转义序列 + 同步输出 (CSI ?2026h/l)</td></tr>
+      <tr><td>模型注册表</td><td>自动从 OpenRouter + models.dev 生成</td></tr>
+      <tr><td>认证</td><td>OAuth（Claude Pro/Max）/ API Key</td></tr>
+      <tr><td>包管理</td><td>npm，严格锁文件策略（save-exact=always, min-release-age=2）</td></tr>
+      <tr><td>构建</td><td>Monorepo</td></tr>
+    </table>
+  </div>
+</section>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <p>本文档基于 <a href="https://github.com/earendil-works/pi">earendil-works/pi</a> 项目生成 · 作者 <a href="https://mariozechner.at">Mario Zechner</a></p>
+  <p style="margin-top:4px;">了解更多：<a href="https://pi.dev">pi.dev</a> · <a href="https://discord.com/invite/3cU7Bz4UPx">Discord</a> · <a href="https://earendil.com">Earendil</a></p>
+</div>
+
+</div>
+
+</body>
+</html>

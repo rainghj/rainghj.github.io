@@ -51,13 +51,16 @@
 
 /* Warm Theme Specific */
 body.theme-warm {
+  background: var(--bg);
+  color: var(--text);
   font-family: "Source Han Serif SC", "Noto Serif SC", Georgia, serif;
 }
 
 body.theme-warm .content-inner {
   animation: fadeInWarm 0.5s ease-out;
   border: 1px solid rgba(61, 53, 40, 0.08);
-  background: repeating-linear-gradient(
+  background-color: var(--bg-elevated);
+  background-image: repeating-linear-gradient(
     0deg,
     transparent,
     transparent 28px,
@@ -89,8 +92,19 @@ body.theme-warm .content h1 {
 
 body.theme-warm .content pre {
   background: #2c2416;
+  color: #e8e0d4;
   border: none;
   border-radius: var(--radius-sm);
+}
+
+body.theme-warm .content code {
+  background: var(--accent-dim);
+  color: var(--text);
+}
+
+body.theme-warm .content pre code {
+  color: inherit;
+  background: transparent;
 }
 
 body.theme-warm .content pre::before {
@@ -102,9 +116,14 @@ body.theme-warm .sidebar-logo {
   box-shadow: var(--accent-glow);
 }
 
-body.theme-warm .nav-item::before {
+body.theme-warm .nav-item.active::before {
   background: var(--accent);
   width: 3px;
+}
+
+body.theme-warm .nav-item.active {
+  background: var(--accent-dim);
+  color: var(--sidebar-text-active);
 }
 
 /* Scrollbar */

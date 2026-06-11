@@ -2,6 +2,62 @@
 
 Claude Code 是 Anthropic 官方的命令行工具，帮助你在终端中使用 Claude 进行编程。
 
+## 快速上手
+
+启动 Claude Code 后，所有操作在终端交互界面中进行。以下分两类命令：
+
+### 启动命令（终端执行）
+
+```bash
+# 启动交互式会话
+claude
+
+# 继续上次对话
+claude -c
+
+# 指定模型并设置努力级别
+claude --model claude-sonnet-4-7 --effort high
+
+# 绕过权限检查（CI/CD 或信任环境）
+claude --permission-mode bypassPermissions
+
+# 非交互模式直接提问
+claude -p "解释一下这个项目的架构"
+
+# 创建隔离工作区
+claude -w
+```
+
+### 会话内命令（在 Claude 对话界面中输入）
+
+进入 Claude 交互界面后，所有命令以 `/` 开头：
+
+```bash
+# 查看帮助
+/help
+
+# 清除当前对话历史
+/clear
+
+# 查看当前会话费用
+/cost
+
+# 压缩对话历史（节省上下文）
+/compact
+
+# 撤销上一步操作
+/undo
+
+# 重试上一步
+/retry
+
+# 切换模型
+/model sonnet
+
+# 全局搜索代码库
+/search "搜索关键词"
+```
+
 ## 安装
 
 ```bash
@@ -224,7 +280,36 @@ claude upgrade latest   # 升级到最新版本
 
 ---
 
+## 会话内命令（斜杠命令）
+
+在 Claude Code 交互界面中，直接输入以 `/` 开头的命令：
+
+| 命令 | 说明 |
+|------|------|
+| `/help` | 显示帮助信息 |
+| `/clear` | 清除当前对话历史 |
+| `/cost` | 查看当前会话费用 |
+| `/compact` | 压缩对话历史，节省上下文窗口 |
+| `/undo` | 撤销上一步操作 |
+| `/retry` | 重试上一条消息 |
+| `/model <name>` | 切换模型（如 `/model sonnet`） |
+| `/add` | 将文件添加到会话上下文 |
+| `/drop` | 从会话上下文中移除文件 |
+| `/review` | 对当前 diff 进行代码审查 |
+| `/search "关键词"` | 全局搜索代码库 |
+| `/task` | 查看和管理任务列表 |
+| `/init` | 初始化 CLAUDE.md 配置文件 |
+| `/doctor` | 诊断项目配置和状态 |
+| `/loop <间隔> <命令>` | 定时重复执行命令 |
+| `/config` | 查看或修改配置 |
+| `/copy` | 复制最后一条代码回复 |
+| `/bash` | 执行 shell 命令 |
+
+---
+
 ## 常用命令速查
+
+### 终端启动命令
 
 | 命令 | 说明 |
 |------|------|
@@ -232,12 +317,141 @@ claude upgrade latest   # 升级到最新版本
 | `claude -p "提示"` | 非交互模式执行 |
 | `claude -c` | 继续最近对话 |
 | `claude -r <id>` | 恢复指定会话 |
+| `claude --model sonnet` | 指定模型启动 |
+| `claude --effort high` | 设置高努力级别 |
+| `claude -w` | 创建 git worktree 隔离工作 |
+| `claude --permission-mode bypassPermissions` | 绕过所有权限检查 |
+| `claude --permission-mode plan` | 仅允许计划操作 |
+| `claude --dangerously-skip-permissions` | 跳过权限确认（沙盒环境） |
 | `claude --help` | 显示帮助 |
 | `claude --version` | 显示版本 |
 | `claude mcp list` | 列出 MCP 服务器 |
+| `claude mcp add <name> <command>` | 添加 MCP 服务器 |
 | `claude plugin list` | 列出插件 |
+| `claude plugin install <name>` | 安装插件 |
+| `claude agents list` | 列出后台 agents |
+| `claude agents start` | 启动后台 agent |
 | `claude doctor` | 检查健康状态 |
 | `claude update` | 检查更新 |
+| `claude upgrade latest` | 升级到最新版本 |
+| `claude upgrade stable` | 升级到稳定版 |
+| `claude ultrareview` | 运行云端多 agent 代码审查 |
+| `claude project init` | 初始化项目 |
+| `claude auth status` | 查看认证状态 |
+
+### 会话内斜杠命令
+
+| 命令 | 说明 |
+|------|------|
+| `/help` | 显示帮助 |
+| `/clear` | 清除对话历史 |
+| `/compact` | 压缩对话历史 |
+| `/undo` | 撤销上一步 |
+| `/retry` | 重试上一条消息 |
+| `/model sonnet` | 切换模型 |
+| `/search "关键词"` | 全局搜索 |
+| `/cost` | 查看会话费用 |
+| `/task` | 任务管理 |
+
+---
+
+## 最新版本重要功能
+
+### worktree 模式 (`-w, --worktree`)
+
+自动创建隔离的 git worktree，在不影响主工作区的情况下进行实验性开发：
+
+```bash
+# 创建随机命名的 worktree 并进入
+claude -w
+
+# 指定 worktree 名称
+claude -w my-feature
+
+# worktree + tmux 组合
+claude -w --tmux
+```
+
+worktree 会话结束后可选择保留或清理，更改不会自动并入主分支。
+
+### 努力级别 (`--effort`)
+
+控制 Claude 推理深度，适用于不同复杂度任务：
+
+```bash
+claude --effort low      # 简单任务，更快响应
+claude --effort medium   # 默认级别
+claude --effort high     # 复杂推理任务
+claude --effort xhigh    # 非常高
+claude --effort max      # 最高努力级别（深度推理）
+```
+
+### agents 后台任务
+
+让 Claude 在后台持续运行，处理监控、批量操作等长时间任务：
+
+```bash
+# 列出所有 agents
+claude agents list
+
+# 启动 agent（可指定名称）
+claude agents start --name my-agent --prompt "每小时检查服务状态"
+
+# 停止 agent
+claude agents stop --name my-agent
+```
+
+### ultrareview 云端审查
+
+利用云端多 agent 并行审查代码变更：
+
+```bash
+# 审查当前分支
+claude ultrareview
+
+# 审查指定 PR
+claude ultrareview 42
+
+# 审查分支差异
+claude ultrareview main..feature-branch
+```
+
+### 权限模式实践
+
+不同场景推荐使用的权限模式：
+
+```bash
+# 绕过所有权限检查（最常用）
+claude --permission-mode bypassPermissions
+
+# 配合管道模式使用
+claude -p "your task" --permission-mode bypassPermissions
+
+# CI/CD 自动化环境
+claude -p "任务描述" --permission-mode bypassPermissions
+
+# 日常开发（自动接受编辑）
+claude --permission-mode acceptEdits
+
+# 审查/计划阶段（仅查看不动手）
+claude --permission-mode plan
+
+# 沙盒/测试环境（跳过所有确认）
+claude -p "task" --dangerously-skip-permissions
+```
+
+### 更新管理
+
+```bash
+# 检查是否有可用更新
+claude update
+
+# 升级到最新的稳定版本（推荐）
+claude upgrade stable
+
+# 升级到最新版本（可能包含实验性功能）
+claude upgrade latest
+```
 
 ---
 

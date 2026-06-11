@@ -51,6 +51,8 @@
 
 /* Editorial Theme Specific */
 body.theme-editorial {
+  background: var(--bg);
+  color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
   font-weight: 400;
   line-height: 1.6;
@@ -60,7 +62,9 @@ body.theme-editorial .content-inner {
   animation: fadeInEditorial 0.6s ease-out;
   border: none;
   box-shadow: var(--shadow-lg);
-  max-width: 720px;
+  max-width: 960px;
+  margin: 0 auto;
+  background: var(--bg-elevated);
 }
 
 @keyframes fadeInEditorial {
@@ -134,6 +138,10 @@ body.theme-editorial .content code {
   padding: 0.15rem 0.4rem;
   border-radius: 3px;
   font-size: 0.875em;
+}
+
+body.theme-editorial .content pre code {
+  color: inherit;
 }
 
 body.theme-editorial .content table {

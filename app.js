@@ -2,7 +2,7 @@
 let navData = null;
 let currentDoc = null;
 let isLoading = false;
-let currentTheme = localStorage.getItem('theme') || 'dark';
+let currentTheme = localStorage.getItem('theme') || 'warm';
 
 // Initialize
 document.addEventListener('DOMContentLoaded', init);
@@ -103,6 +103,26 @@ async function loadDocument(docPath) {
         const response = await fetch(docPath);
         if (!response.ok) throw new Error('Document not found');
 
+        // Handle .html files directly
+        if (docPath.endsWith('.html')) {
+            const html = await response.text();
+            // Extract <style> tags from head
+            const styleMatch = html.match(/<style>([\s\S]*?)<\/style>/g);
+            let styles = '';
+            if (styleMatch) {
+                styles = styleMatch.join('\n');
+            }
+            // Extract body content (everything inside <body>)
+            const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+            const bodyContent = bodyMatch ? bodyMatch[1] : html;
+            contentArea.innerHTML = `<div class="content-inner">${styles}${bodyContent}</div>`;
+            closeMobileMenu();
+            window.location.hash = docPath;
+            renderSidebar();
+            isLoading = false;
+            return;
+        }
+
         const markdown = await response.text();
 
         // Configure marked
@@ -164,7 +184,11 @@ window.addEventListener('hashchange', handleHashChange);
 async function handleHashChange() {
     const hash = window.location.hash.slice(1);
     if (hash && hash !== currentDoc) {
-        await loadDocument(hash);
+        // Only load if hash matches a known document path (ignore anchor links like #overview)
+        const isDocPath = navData && navData.groups.some(g => g.items.some(i => i.doc === hash));
+        if (isDocPath) {
+            await loadDocument(hash);
+        }
     }
 }
 

@@ -63,6 +63,11 @@ body.theme-dark .sidebar-logo {
   box-shadow: var(--accent-glow);
 }
 
+body.theme-dark .nav-item.active {
+  background: var(--accent-dim);
+  color: var(--sidebar-text-active);
+}
+
 body.theme-dark .content pre::before {
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
 }
