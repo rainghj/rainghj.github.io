@@ -6,7 +6,7 @@
       "items": [
         { "title": "Claude Code", "icon": "🤖", "doc": "docs/claude-code.md" },
         { "title": "Superpowers", "icon": "⚡", "doc": "docs/superpowers.md" },
-        { "title": "MiMo-Code", "icon": "🧠", "doc": "MiMo-Code 使用说明.html" }
+        { "title": "MiMo-Code", "icon": "🧠", "doc": "docs/MiMo-Code 使用说明.html" }
       ]
     },
     {
